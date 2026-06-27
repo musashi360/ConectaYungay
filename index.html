@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explora el histórico Barrio Yungay en Santiago. Traza tu recorrido patrimonial interactivo desde Metro Cumming o Metro Quinta Normal y obtén descuentos exclusivos en cafeterías, restaurantes y heladerías cercanas.">
+    <title>Conecta Yungay — Recorrido Patrimonial Interactivo</title>
+
+    <!-- Leaflet CSS — sin atributos integrity para compatibilidad con file:// y HTTP local -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+    <!-- Leaflet JS (cargado en el head para estar disponible antes de los scripts de la app) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- html2canvas para exportar el mapa como imagen -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/logo_sin_fondo.png">
+</head>
+<body>
+
+    <!-- 1. PANTALLA DE BIENVENIDA -->
+    <main id="welcome-screen" class="welcome-container fade-in">
+        <section class="welcome-card">
+            <img src="assets/logo_sin_fondo.png" alt="Logo Conecta Yungay" class="logo-welcome">
+            <h1>Conecta Yungay</h1>
+            <h2>Pasaporte Patrimonial</h2>
+            <p class="welcome-description">
+                Te damos la bienvenida al barrio patrimonial más vibrante de Santiago. Escanea tu código QR o selecciona tu punto de partida para trazar tu recorrido personalizado y descubrir tesoros locales con beneficios exclusivos.
+            </p>
+            <h3 class="welcome-options-title">¿Dónde te encuentras?</h3>
+            <div class="welcome-buttons-grid">
+                <button id="btn-cumming" class="btn-choice">
+                    Metro Cumming
+                    <span>Línea 5 — Acceso Este</span>
+                </button>
+                <button id="btn-quintanormal" class="btn-choice">
+                    Metro Quinta Normal
+                    <span>Línea 5 — Acceso Oeste</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- 2. PANTALLA PRINCIPAL DE LA APLICACIÓN -->
+    <div id="app-screen" class="hidden">
+
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-branding">
+                <img src="assets/logo_sin_fondo.png" alt="Conecta Yungay" class="logo-header">
+                <div class="header-title-container">
+                    <h1 id="route-name">Cargando Recorrido...</h1>
+                    <p>Barrio Yungay, Santiago</p>
+                </div>
+            </div>
+            <button id="btn-reset" class="btn-back">Cambiar Origen</button>
+        </header>
+
+        <!-- Contenedor Principal -->
+        <main class="app-container">
+
+            <!-- Columna del Mapa -->
+            <section class="map-card fade-in">
+                <!-- Mapa interactivo Leaflet -->
+                <div id="map-container"></div>
+
+                <div class="map-actions">
+                    <button id="btn-generate" class="btn-primary">Generar Recorrido</button>
+                    <button id="btn-download" class="btn-success" disabled>Descargar Mapa</button>
+                </div>
+            </section>
+
+            <!-- Columna de Detalles y Descuentos -->
+            <section class="detail-column">
+
+                <!-- Banner de Frase -->
+                <div class="poetry-banner fade-in">
+                    <p>
+                        "Cada calle tiene una historia. Cada pausa, un nuevo sabor.
+                        Presenta tu pasaporte y recibe un beneficio exclusivo."
+                    </p>
+                </div>
+
+                <!-- Tarjeta de Recorrido -->
+                <div class="route-card fade-in">
+                    <h2>Recorrido Patrimonial</h2>
+                    <div id="nodes-container" class="nodes-scroller"></div>
+                </div>
+
+                <!-- Tarjeta de Descuentos -->
+                <div class="discounts-card fade-in">
+                    <h2>Lugares con Descuento</h2>
+                    <p class="discounts-subtitle">
+                        Recomendaciones más cercanas para: <span id="selected-node-label">Ninguno</span>
+                    </p>
+                    <div id="discounts-container" class="discounts-grid"></div>
+                </div>
+
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>Proyecto de Fomento al Turismo de Barrio Yungay — © 2026 <span>Conecta Yungay</span>. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    <!-- Leaflet y html2canvas ya cargados en el <head> -->
+
+    <!-- Arquitectura N-Capas (orden de dependencias) -->
+    <script src="js/data/routeRepository.js"></script>
+    <script src="js/business/routeService.js"></script>
+    <script src="js/presentation/mapRenderer.js"></script>
+    <script src="js/presentation/uiController.js"></script>
+</body>
+</html>

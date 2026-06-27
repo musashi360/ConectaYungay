@@ -1,0 +1,242 @@
+/**
+ * CAPA DE PRESENTACIÓN (Presentation Layer - UI Controller)
+ * ConectaYungay - Controlador de Interfaz y Lógica del Cliente
+ * 
+ * NOTA: El mapa Leaflet se inicializa de forma diferida (lazy) cuando el usuario
+ * elige un origen, NO durante el arranque de la UI. Esto evita que un error de
+ * carga de la librería Leaflet bloquee los botones de la pantalla de bienvenida.
+ */
+
+window.ConectaYungay = window.ConectaYungay || {};
+
+ConectaYungay.UI = (function () {
+    let routeNodes        = [];
+    let discountsList     = [];
+    let currentOrigin     = null;
+    let mapInitialized    = false;
+
+    // Referencias al DOM — se llenan en init()
+    const DOM = {};
+
+    // ─────────────────────────────────────────────
+    //  INICIALIZACIÓN PRINCIPAL
+    // ─────────────────────────────────────────────
+    function init() {
+        // Cachear elementos del DOM
+        DOM.welcomeScreen       = document.getElementById('welcome-screen');
+        DOM.appScreen           = document.getElementById('app-screen');
+        DOM.btnCumming          = document.getElementById('btn-cumming');
+        DOM.btnQuintaNormal     = document.getElementById('btn-quintanormal');
+        DOM.btnGenerate         = document.getElementById('btn-generate');
+        DOM.btnDownload         = document.getElementById('btn-download');
+        DOM.btnReset            = document.getElementById('btn-reset');
+        DOM.routeName           = document.getElementById('route-name');
+        DOM.nodesContainer      = document.getElementById('nodes-container');
+        DOM.discountsContainer  = document.getElementById('discounts-container');
+        DOM.selectedNodeLabel   = document.getElementById('selected-node-label');
+
+        // Registrar eventos — SIEMPRE, independiente del mapa
+        DOM.btnCumming.addEventListener('click',      () => selectOrigin('cumming'));
+        DOM.btnQuintaNormal.addEventListener('click', () => selectOrigin('quintanormal'));
+        DOM.btnGenerate.addEventListener('click',     startRouteAnimation);
+        DOM.btnDownload.addEventListener('click',     triggerDownload);
+        DOM.btnReset.addEventListener('click',        resetToWelcome);
+
+        // Cargar descuentos en segundo plano (no bloquea la UI)
+        ConectaYungay.Repository.getDiscounts()
+            .then(data => { discountsList = data; })
+            .catch(e   => console.warn('Descuentos: usando fallback.', e));
+
+        // Detectar parámetro QR en la URL
+        detectQRParams();
+    }
+
+    // ─────────────────────────────────────────────
+    //  DETECCIÓN DE PARÁMETRO QR
+    // ─────────────────────────────────────────────
+    function detectQRParams() {
+        const origin = new URLSearchParams(window.location.search).get('origin') || '';
+        if (origin === 'cumming' || origin === 'metro-cumming') {
+            selectOrigin('cumming');
+        } else if (['quintanormal', 'quinta-normal', 'metro-quinta-normal'].includes(origin)) {
+            selectOrigin('quintanormal');
+        } else {
+            showScreen('welcome');
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    //  CONTROL DE PANTALLAS
+    // ─────────────────────────────────────────────
+    function showScreen(screen) {
+        if (screen === 'welcome') {
+            DOM.welcomeScreen.classList.remove('hidden');
+            DOM.appScreen.classList.add('hidden');
+        } else {
+            DOM.welcomeScreen.classList.add('hidden');
+            DOM.appScreen.classList.remove('hidden');
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    //  SELECCIÓN DE ORIGEN
+    // ─────────────────────────────────────────────
+    async function selectOrigin(origin) {
+        currentOrigin = origin;
+        const displayName = origin === 'cumming' ? 'Metro Cumming' : 'Metro Quinta Normal';
+        DOM.routeName.textContent = `Recorrido desde ${displayName}`;
+
+        showScreen('app');
+
+        // Inicializar el mapa Leaflet de forma diferida (solo la primera vez)
+        // Se hace DESPUÉS de mostrar el contenedor, para que Leaflet calcule el tamaño correctamente
+        setTimeout(() => {
+            try {
+                if (!mapInitialized) {
+                    ConectaYungay.MapRenderer.init('map-container');
+                    mapInitialized = true;
+                } else {
+                    ConectaYungay.MapRenderer.resetView();
+                }
+            } catch (err) {
+                console.error('Error al inicializar el mapa:', err);
+            }
+        }, 150);
+
+        // Cargar nodos de la ruta
+        try {
+            routeNodes = await ConectaYungay.Repository.getRoute(origin);
+            DOM.btnGenerate.removeAttribute('disabled');
+            DOM.btnDownload.setAttribute('disabled', 'true');
+            DOM.nodesContainer.innerHTML = '<p class="placeholder-text">Haz clic en "Generar Recorrido" para trazar la ruta en el mapa.</p>';
+            DOM.discountsContainer.innerHTML = '<p class="placeholder-text">Los descuentos aparecerán al iniciar el recorrido.</p>';
+            DOM.selectedNodeLabel.textContent = 'Ninguno';
+        } catch (e) {
+            console.error('Error al cargar ruta:', e);
+            DOM.nodesContainer.innerHTML = `<p class="error-text">No se pudo cargar la ruta para ${displayName}.</p>`;
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    //  ANIMACIÓN DEL RECORRIDO
+    // ─────────────────────────────────────────────
+    function startRouteAnimation() {
+        if (!routeNodes.length) return;
+
+        DOM.btnGenerate.setAttribute('disabled', 'true');
+        DOM.nodesContainer.innerHTML = '';
+
+        ConectaYungay.MapRenderer.animateRoute(routeNodes, (node, index) => {
+            appendNodeToList(node, index);
+            selectActiveNode(index);
+
+            if (index === routeNodes.length - 1) {
+                DOM.btnDownload.removeAttribute('disabled');
+                DOM.btnGenerate.removeAttribute('disabled');
+            }
+        }, 350);
+    }
+
+    function appendNodeToList(node, index) {
+        const el = document.createElement('div');
+        el.className = 'route-node-item fade-in';
+        el.id = `ui-node-${index}`;
+        el.innerHTML = `
+            <div class="node-number">${index + 1}</div>
+            <div class="node-details"><span class="node-name">${node.name}</span></div>
+        `;
+        el.addEventListener('click', () => selectActiveNode(index));
+        DOM.nodesContainer.appendChild(el);
+        DOM.nodesContainer.scrollTop = DOM.nodesContainer.scrollHeight;
+    }
+
+    // ─────────────────────────────────────────────
+    //  SELECCIÓN DE NODO ACTIVO Y DESCUENTOS
+    // ─────────────────────────────────────────────
+    function selectActiveNode(index) {
+        const node = routeNodes[index];
+        if (!node) return;
+
+        DOM.selectedNodeLabel.textContent = `${index + 1}. ${node.name}`;
+
+        // Marcar activo visualmente
+        DOM.nodesContainer.querySelectorAll('.route-node-item').forEach(el => el.classList.remove('active'));
+        const activeEl = document.getElementById(`ui-node-${index}`);
+        if (activeEl) {
+            activeEl.classList.add('active');
+            activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Capa de Negocio: calcular descuentos más cercanos
+        const recs = ConectaYungay.Service.getClosestDiscounts(
+            { lat: node.lat, lng: node.lng },
+            discountsList
+        );
+        renderDiscountsUI(recs);
+    }
+
+    // ─────────────────────────────────────────────
+    //  RENDERIZAR TARJETAS DE DESCUENTO
+    // ─────────────────────────────────────────────
+    function renderDiscountsUI(recs) {
+        DOM.discountsContainer.innerHTML = '';
+
+        const categories = [
+            { label: 'Cafetería',   data: recs.cafeteria   },
+            { label: 'Restaurante', data: recs.restaurante  },
+            { label: 'Heladería',   data: recs.heladeria    }
+        ];
+
+        categories.forEach(cat => {
+            if (!cat.data) return;
+
+            const query   = encodeURIComponent(`${cat.data.name}, ${cat.data.address}, Barrio Yungay, Santiago, Chile`);
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+
+            const card = document.createElement('div');
+            card.className = 'discount-card fade-in';
+            card.innerHTML = `
+                <div class="discount-card-header">
+                    <span class="discount-category">${cat.label}</span>
+                    <span class="discount-distance">A ${cat.data.distance} metros</span>
+                </div>
+                <div class="discount-card-body">
+                    <h4 class="discount-name">${cat.data.name}</h4>
+                    <p class="discount-address">${cat.data.address}</p>
+                </div>
+                <div class="discount-card-footer">
+                    <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="btn-map-link">
+                        Ver dirección en el mapa
+                    </a>
+                </div>
+            `;
+            DOM.discountsContainer.appendChild(card);
+        });
+    }
+
+    // ─────────────────────────────────────────────
+    //  DESCARGA Y RESET
+    // ─────────────────────────────────────────────
+    function triggerDownload() {
+        const name = currentOrigin === 'cumming' ? 'Metro Cumming' : 'Metro Quinta Normal';
+        try {
+            ConectaYungay.MapRenderer.downloadMap(name);
+        } catch (e) {
+            console.error('Error en descarga:', e);
+        }
+    }
+
+    function resetToWelcome() {
+        const cleanUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+        window.history.pushState({ path: cleanUrl }, '', cleanUrl);
+        currentOrigin = null;
+        routeNodes    = [];
+        try { ConectaYungay.MapRenderer.clearRoute(); } catch (e) {}
+        showScreen('welcome');
+    }
+
+    return { init };
+})();
+
+// Arrancar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', ConectaYungay.UI.init);

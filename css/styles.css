@@ -1,0 +1,681 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* variables de diseño basadas en la paleta del proyecto */
+:root {
+    --color-crimson: #A7302A;     /* #A7302A - Rojo Primario */
+    --color-cream: #F6EFE4;       /* #F6EFE4 - Fondo General */
+    --color-gold: #C88A2A;        /* #C88A2A - Accent dorado */
+    --color-sage: #66754D;        /* #66754D - Verde Oliva */
+    --color-slate: #6E6A65;       /* #6E6A65 - Texto Secundario/Bordes */
+    --color-dark: #2C2A29;        /* Neutro muy oscuro para encabezados */
+    --color-white: #FFFFFF;
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Outfit', sans-serif;
+    --shadow-sm: 0 4px 6px -1px rgba(110, 106, 101, 0.1), 0 2px 4px -1px rgba(110, 106, 101, 0.06);
+    --shadow-md: 0 10px 15px -3px rgba(110, 106, 101, 0.15), 0 4px 6px -2px rgba(110, 106, 101, 0.05);
+    --shadow-lg: 0 20px 25px -5px rgba(110, 106, 101, 0.2), 0 10px 10px -5px rgba(110, 106, 101, 0.1);
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+}
+
+/* Reset y estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--color-cream);
+    color: var(--color-dark);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Personalización del scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(110, 106, 101, 0.05);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--color-slate);
+    border-radius: var(--radius-sm);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-crimson);
+}
+
+/* Clases de utilidad */
+.hidden {
+    display: none !important;
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* PANTALLA DE BIENVENIDA (Welcome Screen) */
+.welcome-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--color-cream) 0%, #EFE7DA 100%);
+    position: relative;
+}
+
+/* Círculos decorativos en el fondo */
+.welcome-container::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: rgba(102, 117, 77, 0.08); /* sage translucent */
+    z-index: 0;
+    filter: blur(40px);
+}
+
+.welcome-container::after {
+    content: '';
+    position: absolute;
+    bottom: -10%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: rgba(167, 48, 42, 0.06); /* crimson translucent */
+    z-index: 0;
+    filter: blur(50px);
+}
+
+.welcome-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    padding: 45px 35px;
+    width: 100%;
+    max-width: 580px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    z-index: 1;
+}
+
+.logo-welcome {
+    max-width: 180px;
+    height: auto;
+    margin-bottom: 25px;
+    transition: transform 0.3s ease;
+}
+
+.logo-welcome:hover {
+    transform: scale(1.05);
+}
+
+.welcome-card h1 {
+    font-family: var(--font-heading);
+    font-size: 2.8rem;
+    color: var(--color-crimson);
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.welcome-card h2 {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--color-gold);
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.welcome-description {
+    color: var(--color-slate);
+    font-size: 1.05rem;
+    margin-bottom: 35px;
+    font-weight: 400;
+}
+
+.welcome-options-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-dark);
+    margin-bottom: 15px;
+}
+
+.welcome-buttons-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+@media (max-width: 480px) {
+    .welcome-buttons-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.btn-choice {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    border: 2px solid var(--color-slate);
+    padding: 16px 20px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-choice span {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--color-slate);
+}
+
+.btn-choice:hover {
+    border-color: var(--color-crimson);
+    color: var(--color-crimson);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    background-color: rgba(167, 48, 42, 0.02);
+}
+
+/* PANTALLA PRINCIPAL DE LA APLICACIÓN (App Screen) */
+.app-header {
+    background-color: var(--color-white);
+    box-shadow: var(--shadow-sm);
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.header-branding {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-header {
+    height: 48px;
+    width: auto;
+}
+
+.header-title-container h1 {
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    color: var(--color-crimson);
+    line-height: 1.2;
+}
+
+.header-title-container p {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    color: var(--color-gold);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.btn-back {
+    background: none;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-slate);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.2s ease;
+}
+
+.btn-back:hover {
+    color: var(--color-crimson);
+}
+
+/* Layout de la Aplicación */
+.app-container {
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 580px 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+@media (max-width: 1100px) {
+    .app-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* COLUMNA DEL MAPA */
+.map-card {
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 25px;
+    border: 1px solid rgba(110, 106, 101, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.canvas-wrapper,
+#map-container {
+    width: 100%;
+    height: 520px;
+    background-color: var(--color-cream);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    border: 2px solid rgba(110, 106, 101, 0.15);
+    position: relative;
+    z-index: 0;
+}
+
+/* Sobrescribir z-index de controles Leaflet para que no tapen la UI */
+.leaflet-top,
+.leaflet-bottom {
+    z-index: 1;
+}
+
+@media (max-width: 1100px) {
+    #map-container {
+        height: 420px;
+    }
+}
+
+.map-actions {
+    width: 100%;
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+@media (max-width: 480px) {
+    .map-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
+.btn-primary {
+    background-color: var(--color-crimson);
+    color: var(--color-white);
+    border: none;
+    padding: 14px 24px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(167, 48, 42, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #8C2520;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(167, 48, 42, 0.3);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    background-color: var(--color-slate);
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.btn-success {
+    background-color: var(--color-sage);
+    color: var(--color-white);
+    border: none;
+    padding: 14px 24px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(102, 117, 77, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-success:hover:not(:disabled) {
+    background-color: #556240;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(102, 117, 77, 0.3);
+}
+
+.btn-success:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-success:disabled {
+    background-color: var(--color-slate);
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* COLUMNA DE DETALLES Y DESCUENTOS */
+.detail-column {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Banner de Frase Yungay */
+.poetry-banner {
+    background: linear-gradient(135deg, var(--color-gold) 0%, #AF741D 100%);
+    border-radius: var(--radius-md);
+    padding: 25px 30px;
+    box-shadow: var(--shadow-md);
+    color: var(--color-white);
+    border-left: 6px solid var(--color-crimson);
+    position: relative;
+    overflow: hidden;
+}
+
+.poetry-banner::before {
+    content: '"';
+    position: absolute;
+    right: 15px;
+    bottom: -20px;
+    font-size: 10rem;
+    font-family: var(--font-heading);
+    color: rgba(255, 255, 255, 0.08);
+    line-height: 1;
+}
+
+.poetry-banner p {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    line-height: 1.5;
+    font-style: italic;
+    font-weight: 400;
+}
+
+/* Contenedor del recorrido en barra lateral */
+.route-card {
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(110, 106, 101, 0.1);
+    padding: 25px;
+}
+
+.route-card h2 {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    color: var(--color-crimson);
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--color-cream);
+    padding-bottom: 10px;
+}
+
+/* Lista de Nodos */
+.nodes-scroller {
+    max-height: 230px;
+    overflow-y: auto;
+    padding-right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-radius: var(--radius-sm);
+}
+
+.placeholder-text {
+    color: var(--color-slate);
+    font-style: italic;
+    text-align: center;
+    padding: 30px 10px;
+    font-size: 0.95rem;
+}
+
+.error-text {
+    color: var(--color-crimson);
+    text-align: center;
+    padding: 20px;
+    font-weight: 500;
+}
+
+.route-node-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    background-color: var(--color-cream);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.route-node-item:hover {
+    transform: translateX(5px);
+    border-color: var(--color-gold);
+    background-color: var(--color-white);
+    box-shadow: var(--shadow-sm);
+}
+
+.route-node-item.active {
+    background-color: var(--color-crimson);
+    color: var(--color-white);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-crimson);
+}
+
+.node-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: var(--color-gold);
+    color: var(--color-white);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.route-node-item.active .node-number {
+    background-color: var(--color-white);
+    color: var(--color-crimson);
+}
+
+.node-details {
+    flex-grow: 1;
+}
+
+.node-name {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* SECCIÓN DE DESCUENTOS CERCANOS */
+.discounts-card {
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(110, 106, 101, 0.1);
+    padding: 25px;
+}
+
+.discounts-card h2 {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    color: var(--color-crimson);
+    margin-bottom: 5px;
+}
+
+.discounts-subtitle {
+    font-size: 0.95rem;
+    color: var(--color-slate);
+    margin-bottom: 20px;
+}
+
+.discounts-subtitle span {
+    font-weight: 700;
+    color: var(--color-gold);
+}
+
+/* Grid de tarjetas de descuento */
+.discounts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.discount-card {
+    background-color: var(--color-cream);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(110, 106, 101, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.discount-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: var(--color-gold);
+}
+
+.discount-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-gold);
+}
+
+.discount-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.discount-category {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-sage);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.discount-distance {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-slate);
+    background-color: rgba(110, 106, 101, 0.08);
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.discount-card-body {
+    margin-bottom: 20px;
+}
+
+.discount-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin-bottom: 5px;
+    line-height: 1.3;
+}
+
+.discount-address {
+    font-size: 0.9rem;
+    color: var(--color-slate);
+    line-height: 1.4;
+}
+
+.discount-card-footer {
+    margin-top: auto;
+}
+
+.btn-map-link {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    border: 1px solid var(--color-slate);
+    padding: 10px 15px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-map-link:hover {
+    background-color: var(--color-crimson);
+    color: var(--color-white);
+    border-color: var(--color-crimson);
+}
+
+/* FOOTER */
+.app-footer {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--color-slate);
+    font-size: 0.9rem;
+    margin-top: 50px;
+    border-top: 1px solid rgba(110, 106, 101, 0.1);
+}
+
+.app-footer span {
+    font-weight: 700;
+    color: var(--color-crimson);
+}

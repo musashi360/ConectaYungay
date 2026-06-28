@@ -261,20 +261,33 @@ body {
     color: var(--color-crimson);
 }
 
-/* Layout de la Aplicación */
+/* Layout principal — 3 columnas: 45% mapa | ~27.5% recorrido | ~27.5% descuentos */
 .app-container {
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 30px auto;
     padding: 0 20px;
     display: grid;
-    grid-template-columns: 580px 1fr;
-    gap: 30px;
+    grid-template-columns: 45% 1fr 1fr;
+    gap: 24px;
     align-items: start;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
+    .app-container {
+        grid-template-columns: 45% 1fr;
+    }
+    /* En tablet el panel de descuentos cae debajo del recorrido */
+    .discounts-card.panel-card {
+        grid-column: 2 / 3;
+    }
+}
+
+@media (max-width: 900px) {
     .app-container {
         grid-template-columns: 1fr;
+    }
+    .discounts-card.panel-card {
+        grid-column: auto;
     }
 }
 
@@ -309,7 +322,7 @@ body {
     z-index: 1;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 900px) {
     #map-container {
         height: 420px;
     }
@@ -399,11 +412,21 @@ body {
     box-shadow: none;
 }
 
-/* COLUMNA DE DETALLES Y DESCUENTOS */
-.detail-column {
+/* Estilos comunes a los paneles laterales (recorrido y descuentos) */
+.panel-card {
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(110, 106, 101, 0.1);
+    padding: 25px;
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 16px;
+}
+
+/* Eliminar la detail-column (ya no se usa en el HTML) */
+.detail-column {
+    display: contents; /* Transparente al grid, sus hijos participan directamente */
 }
 
 /* Banner de Frase Yungay */
@@ -431,14 +454,23 @@ body {
 
 .poetry-banner p {
     font-family: var(--font-heading);
-    font-size: 1.25rem;
+    font-size: 1rem;
     line-height: 1.5;
     font-style: italic;
     font-weight: 400;
 }
 
-/* Contenedor del recorrido en barra lateral */
+/* Contenedor del recorrido (ahora es directamente panel-card) */
 .route-card {
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(110, 106, 101, 0.1);
+    padding: 25px;
+}
+
+/* Contenedor de descuentos (ahora es directamente panel-card) */
+.discounts-card {
     background-color: var(--color-white);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
@@ -455,9 +487,9 @@ body {
     padding-bottom: 10px;
 }
 
-/* Lista de Nodos */
+/* Lista de Nodos — altura adaptada al panel lateral completo */
 .nodes-scroller {
-    max-height: 230px;
+    max-height: 420px;
     overflow-y: auto;
     padding-right: 10px;
     display: flex;
@@ -535,14 +567,7 @@ body {
     font-size: 1rem;
 }
 
-/* SECCIÓN DE DESCUENTOS CERCANOS */
-.discounts-card {
-    background-color: var(--color-white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    border: 1px solid rgba(110, 106, 101, 0.1);
-    padding: 25px;
-}
+/* Estilos del panel de descuentos (la base la da .panel-card) */
 
 .discounts-card h2 {
     font-family: var(--font-heading);
@@ -562,11 +587,11 @@ body {
     color: var(--color-gold);
 }
 
-/* Grid de tarjetas de descuento */
+/* Descuentos apilados verticalmente — el panel ya es estrecho */
 .discounts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .discount-card {

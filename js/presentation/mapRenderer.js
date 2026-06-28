@@ -62,7 +62,8 @@ ConectaYungay.MapRenderer = (function () {
             center:         [CENTER.lat, CENTER.lng],
             zoom:           ZOOM,
             zoomControl:    true,
-            scrollWheelZoom: true
+            scrollWheelZoom: true,
+            renderer:       L.canvas() // Fuerza a Leaflet a dibujar líneas en Canvas, previniendo el bug de desplazamiento en html2canvas
         });
 
         // Tiles de OpenStreetMap

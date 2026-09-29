@@ -2,7 +2,7 @@
 # Resuelve bloqueos de CORS cargando archivos locales de texto plano y mapas.
 
 $port = 8000
-$localPath = "c:\Users\Carolina\OneDrive\Escritorio\ConectaYungay"
+$localPath = "c:\Users\mtagl\Documents\ConectaYungay"
 $url = "http://localhost:$port/"
 
 $listener = New-Object System.Net.HttpListener
@@ -38,7 +38,8 @@ try {
         $relativeFile = $rawUrl.TrimStart('/')
         if ([string]::IsNullOrEmpty($relativeFile)) {
             $filePath = Join-Path $localPath "index.html"
-        } else {
+        }
+        else {
             $filePath = Join-Path $localPath $relativeFile
         }
 
@@ -55,18 +56,19 @@ try {
             $contentType = "text/plain"
             switch ($ext) {
                 ".html" { $contentType = "text/html; charset=utf-8" }
-                ".css"  { $contentType = "text/css; charset=utf-8" }
-                ".js"   { $contentType = "application/javascript; charset=utf-8" }
-                ".png"  { $contentType = "image/png" }
-                ".jpg"  { $contentType = "image/jpeg" }
-                ".txt"  { $contentType = "text/plain; charset=utf-8" }
-                ".ico"  { $contentType = "image/x-icon" }
+                ".css" { $contentType = "text/css; charset=utf-8" }
+                ".js" { $contentType = "application/javascript; charset=utf-8" }
+                ".png" { $contentType = "image/png" }
+                ".jpg" { $contentType = "image/jpeg" }
+                ".txt" { $contentType = "text/plain; charset=utf-8" }
+                ".ico" { $contentType = "image/x-icon" }
             }
 
             $response.ContentType = $contentType
             $response.ContentLength64 = $bytes.Length
             $response.OutputStream.Write($bytes, 0, $bytes.Length)
-        } else {
+        }
+        else {
             $response.StatusCode = 404
             $errBytes = [System.Text.Encoding]::UTF8.GetBytes("404 Archivo No Encontrado: $rawUrl")
             $response.ContentType = "text/plain; charset=utf-8"
@@ -74,10 +76,12 @@ try {
         }
         $response.Close()
     }
-} catch {
+}
+catch {
     Write-Error $_
-} finally {
-    if ($listener -ne $null) {
+}
+finally {
+    if ($null -ne $listener) {
         $listener.Stop()
         $listener.Close()
         Write-Output "Servidor detenido."

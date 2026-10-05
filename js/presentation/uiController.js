@@ -103,9 +103,16 @@ ConectaYungay.UI = (function () {
             }
         }, 150);
 
+        // Detener un recorrido que esté animándose del origen anterior y vaciar sus datos
+        try { ConectaYungay.MapRenderer.clearRoute(); } catch (e) { }
+        routeNodes = [];
+
         // Cargar nodos de la ruta
         try {
             routeNodes = await ConectaYungay.Repository.getRoute(origin);
+            if (!routeNodes.length) {
+                throw new Error('La ruta no tiene hitos con coordenadas válidas.');
+            }
             DOM.btnGenerate.removeAttribute('disabled');
             DOM.btnDownload.setAttribute('disabled', 'true');
             DOM.nodesContainer.innerHTML = '<p class="placeholder-text">Haz clic en "Generar Recorrido" para trazar la ruta en el mapa.</p>';
@@ -126,7 +133,7 @@ ConectaYungay.UI = (function () {
         DOM.btnGenerate.setAttribute('disabled', 'true');
         DOM.nodesContainer.innerHTML = '';
 
-        ConectaYungay.MapRenderer.animateRoute(routeNodes, (node, index) => {
+        const started = ConectaYungay.MapRenderer.animateRoute(routeNodes, (node, index) => {
             appendNodeToList(node, index);
             selectActiveNode(index);
 
@@ -135,6 +142,12 @@ ConectaYungay.UI = (function () {
                 DOM.btnGenerate.removeAttribute('disabled');
             }
         }, 350);
+
+        // Si el mapa no está listo, no hay animación que reactive el botón: hacerlo aquí
+        if (!started) {
+            DOM.btnGenerate.removeAttribute('disabled');
+            DOM.nodesContainer.innerHTML = '<p class="error-text">El mapa no está disponible. Revisa tu conexión e intenta de nuevo.</p>';
+        }
     }
 
     function appendNodeToList(node, index) {

@@ -10,21 +10,12 @@
 
     <!-- ═══════════════════════════════════════════════════════════
          CAPA DE SEGURIDAD — FRONTEND
+         Hosting: GitHub Pages. Los headers HTTP no son configurables ahí,
+         así que solo se usan controles que funcionan desde <meta> o JS.
          ═══════════════════════════════════════════════════════════ -->
 
-    <!-- 1. Forzar HTTPS: si el usuario accede por HTTP en producción, se redirige automáticamente -->
-    <script>
-        (function enforceHTTPS() {
-            var loc = window.location;
-            // Solo redirigir en producción (no en localhost ni en file://)
-            var isLocal = loc.hostname === 'localhost'
-                || loc.hostname === '127.0.0.1'
-                || loc.protocol === 'file:';
-            if (!isLocal && loc.protocol !== 'https:') {
-                loc.replace('https:' + loc.href.substring(loc.protocol.length));
-            }
-        })();
-    </script>
+    <!-- 1. Forzar HTTPS (script externo para no necesitar 'unsafe-inline' en la CSP) -->
+    <script src="js/httpsRedirect.js"></script>
 
     <!-- 2. Content Security Policy (CSP)
          Permite únicamente los recursos externos necesarios para la app:
@@ -32,11 +23,14 @@
          - cdnjs        → html2canvas
          - fonts.googleapis.com / fonts.gstatic.com → Google Fonts
          - *.tile.openstreetmap.org → Tiles del mapa
-         - www.google.com → Links de Google Maps (target _blank)
-         Bloquea: scripts inline ajenos, iframes, objects, eval() -->
+         Bloquea: scripts inline, scripts de otros orígenes, objects, iframes.
+         Nota: 'unsafe-inline' en style-src se mantiene porque Leaflet
+         aplica estilos inline por JS. frame-ancestors (anti-clickjacking)
+         no se puede definir en <meta>: en GitHub Pages no hay headers HTTP
+         propios, así que esa protección queda limitada. -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src  'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;
+        script-src  'self' https://unpkg.com https://cdnjs.cloudflare.com;
         style-src   'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com;
         font-src    'self' https://fonts.gstatic.com;
         img-src     'self' data: https://*.tile.openstreetmap.org https://*.openstreetmap.org;
@@ -47,23 +41,23 @@
         form-action 'self';
     ">
 
-    <!-- 3. Evitar que el navegador adivine el tipo MIME de archivos (sniffing) -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-
-    <!-- 4. Política de referencia: no enviar la URL completa al hacer clic en links externos -->
+    <!-- 3. Política de referencia: no enviar la URL completa al hacer clic en links externos -->
     <meta name="referrer" content="strict-origin-when-cross-origin">
 
-    <!-- 5. Evitar que la página sea embebida en iframes de otros dominios (clickjacking) -->
-    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
-
-    <!-- Leaflet CSS — sin atributos integrity para compatibilidad con file:// y HTTP local -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet CSS — con SRI: el navegador rechaza el archivo si el CDN lo altera -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H"
+        crossorigin="" />
 
     <!-- Leaflet JS (cargado en el head para estar disponible antes de los scripts de la app) -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH"
+        crossorigin=""></script>
 
     <!-- html2canvas para exportar el mapa como imagen -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+        integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H"
+        crossorigin="anonymous"></script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -181,4 +175,4 @@
     <script src="js/presentation/uiController.js"></script>
 </body>
 
-</html>
+</html>

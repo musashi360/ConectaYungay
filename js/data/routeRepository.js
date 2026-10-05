@@ -116,12 +116,18 @@ ConectaYungay.Repository = (function () {
         }
     }
 
+    // Un hito sin coordenadas se omite y se registra como error: no se dibuja
+    // en un punto inventado que haría ver una ruta falsa.
     function mapNamesToNodes(names) {
-        return names.map(name => {
+        return names.reduce((nodes, name) => {
             const c = NODE_COORDINATES[name];
-            if (!c) { console.warn(`Sin coordenadas para: ${name}`); return { name, lat: -33.4400, lng: -70.6740 }; }
-            return { name, lat: c.lat, lng: c.lng };
-        });
+            if (!c) {
+                console.error(`[Repository] Sin coordenadas para el hito: "${name}". Se omite.`);
+                return nodes;
+            }
+            nodes.push({ name, lat: c.lat, lng: c.lng });
+            return nodes;
+        }, []);
     }
 
     async function getDiscounts() {
@@ -141,18 +147,25 @@ ConectaYungay.Repository = (function () {
                 if (parts.length >= 2) {
                     const name    = parts[0].trim();
                     const address = parts.slice(1).join('-').trim();
-                    const coords  = DISCOUNT_COORDINATES[name];
-                    discounts.push({ category: cat, name, address, lat: coords?.lat ?? -33.44, lng: coords?.lng ?? -70.674 });
+                    discounts.push(withCoordinates({ category: cat, name, address }));
                 }
             }
-            return discounts;
+            return discounts.filter(Boolean);
         } catch (e) {
             console.warn('Usando datos de respaldo para descuentos.');
-            return DISCOUNTS_FALLBACK.map(item => {
-                const c = DISCOUNT_COORDINATES[item.name];
-                return { ...item, lat: c?.lat ?? -33.44, lng: c?.lng ?? -70.674 };
-            });
+            return DISCOUNTS_FALLBACK.map(item => withCoordinates({ ...item })).filter(Boolean);
         }
+    }
+
+    // Agrega lat/lng desde DISCOUNT_COORDINATES. Si no hay coordenadas, devuelve null
+    // para que el local no aparezca con una distancia falsa.
+    function withCoordinates(discount) {
+        const c = DISCOUNT_COORDINATES[discount.name];
+        if (!c) {
+            console.error(`[Repository] Sin coordenadas para el descuento: "${discount.name}". Se omite.`);
+            return null;
+        }
+        return { ...discount, lat: c.lat, lng: c.lng };
     }
 
     return { getRoute, getDiscounts };

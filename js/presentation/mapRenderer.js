@@ -89,9 +89,10 @@ ConectaYungay.MapRenderer = (function () {
      * @param {Array}    routeNodes  - Nodos cargados del repositorio
      * @param {Function} onNodeAdded - Callback al agregar cada nodo
      * @param {number}   intervalMs  - Milisegundos entre nodo y nodo (defecto 350)
+     * @returns {boolean} true si la animación arrancó; false si el mapa no está listo
      */
     function animateRoute(routeNodes, onNodeAdded, intervalMs = 350) {
-        if (!map) return;
+        if (!map) return false;
         clearRoute();
         isAnimating   = true;
         currentRoute  = routeNodes;
@@ -117,9 +118,10 @@ ConectaYungay.MapRenderer = (function () {
                 zIndexOffset: 1000
             }).addTo(map);
 
+            // El popup acepta HTML: el nombre se escapa igual que en la lista
             marker.bindPopup(`
                 <div style="font-family:'Outfit',sans-serif;text-align:center;min-width:140px">
-                    <strong style="color:${COLOR_CRIMSON};font-size:14px">${number}. ${node.name}</strong>
+                    <strong style="color:${COLOR_CRIMSON};font-size:14px">${number}. ${ConectaYungay.Security.escapeHTML(node.name)}</strong>
                 </div>
             `);
             markers.push(marker);
@@ -155,6 +157,7 @@ ConectaYungay.MapRenderer = (function () {
         }
 
         addNext();
+        return true;
     }
 
     /**
@@ -164,6 +167,8 @@ ConectaYungay.MapRenderer = (function () {
     function downloadMap(routeName) {
         if (!map) return;
         const mapEl = map.getContainer();
+        // allowTaint: true dejaba pasar un canvas contaminado, y toDataURL fallaba después.
+        // Con useCORS, html2canvas omite las teselas que no den CORS y la descarga sigue funcionando.
         // html2canvas está cargado desde CDN en index.html
         if (typeof html2canvas === 'undefined') {
             alert('La librería de captura no está disponible. Asegúrate de tener conexión a internet.');
@@ -171,7 +176,7 @@ ConectaYungay.MapRenderer = (function () {
         }
         html2canvas(mapEl, {
             useCORS:    true,
-            allowTaint: true,
+            allowTaint: false,
             scale:      2
         }).then(canvas => {
             const link     = document.createElement('a');

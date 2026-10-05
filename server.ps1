@@ -49,6 +49,22 @@ try {
         }
 
         if (Test-Path $filePath -PathType Leaf) {
+
+            # ─── PROTECCIÓN ANTI PATH TRAVERSAL ──────────────────────────────
+            # Verifica que el archivo resuelto siga dentro de la carpeta del proyecto.
+            # Esto previene ataques del tipo "../../etc/passwd" en la URL.
+            $resolvedFile = [System.IO.Path]::GetFullPath($filePath)
+            $resolvedProject = [System.IO.Path]::GetFullPath($localPath)
+            if (-not $resolvedFile.StartsWith($resolvedProject)) {
+                $response.StatusCode = 403
+                $errBytes = [System.Text.Encoding]::UTF8.GetBytes("403 Acceso Prohibido")
+                $response.ContentType = "text/plain; charset=utf-8"
+                $response.OutputStream.Write($errBytes, 0, $errBytes.Length)
+                $response.Close()
+                continue
+            }
+            # ─────────────────────────────────────────────────────────────────
+
             $bytes = [System.IO.File]::ReadAllBytes($filePath)
             
             # Content Type
@@ -64,9 +80,21 @@ try {
                 ".ico" { $contentType = "image/x-icon" }
             }
 
+            # ─── HEADERS DE SEGURIDAD HTTP ────────────────────────────────────
+            # Estos headers replican en el servidor local lo que un hosting
+            # de producción (Netlify, Vercel, etc.) debe configurar en su panel.
+            $response.AddHeader("X-Content-Type-Options", "nosniff")
+            $response.AddHeader("X-Frame-Options", "SAMEORIGIN")
+            $response.AddHeader("Referrer-Policy", "strict-origin-when-cross-origin")
+            $response.AddHeader("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
+            # HSTS: fuerza HTTPS por 1 año en producción (ignorado en localhost)
+            $response.AddHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+            # ─────────────────────────────────────────────────────────────────
+
             $response.ContentType = $contentType
             $response.ContentLength64 = $bytes.Length
             $response.OutputStream.Write($bytes, 0, $bytes.Length)
+
         }
         else {
             $response.StatusCode = 404

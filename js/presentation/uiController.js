@@ -10,10 +10,10 @@
 window.ConectaYungay = window.ConectaYungay || {};
 
 ConectaYungay.UI = (function () {
-    let routeNodes        = [];
-    let discountsList     = [];
-    let currentOrigin     = null;
-    let mapInitialized    = false;
+    let routeNodes = [];
+    let discountsList = [];
+    let currentOrigin = null;
+    let mapInitialized = false;
 
     // Referencias al DOM — se llenan en init()
     const DOM = {};
@@ -23,29 +23,29 @@ ConectaYungay.UI = (function () {
     // ─────────────────────────────────────────────
     function init() {
         // Cachear elementos del DOM
-        DOM.welcomeScreen       = document.getElementById('welcome-screen');
-        DOM.appScreen           = document.getElementById('app-screen');
-        DOM.btnCumming          = document.getElementById('btn-cumming');
-        DOM.btnQuintaNormal     = document.getElementById('btn-quintanormal');
-        DOM.btnGenerate         = document.getElementById('btn-generate');
-        DOM.btnDownload         = document.getElementById('btn-download');
-        DOM.btnReset            = document.getElementById('btn-reset');
-        DOM.routeName           = document.getElementById('route-name');
-        DOM.nodesContainer      = document.getElementById('nodes-container');
-        DOM.discountsContainer  = document.getElementById('discounts-container');
-        DOM.selectedNodeLabel   = document.getElementById('selected-node-label');
+        DOM.welcomeScreen = document.getElementById('welcome-screen');
+        DOM.appScreen = document.getElementById('app-screen');
+        DOM.btnCumming = document.getElementById('btn-cumming');
+        DOM.btnQuintaNormal = document.getElementById('btn-quintanormal');
+        DOM.btnGenerate = document.getElementById('btn-generate');
+        DOM.btnDownload = document.getElementById('btn-download');
+        DOM.btnReset = document.getElementById('btn-reset');
+        DOM.routeName = document.getElementById('route-name');
+        DOM.nodesContainer = document.getElementById('nodes-container');
+        DOM.discountsContainer = document.getElementById('discounts-container');
+        DOM.selectedNodeLabel = document.getElementById('selected-node-label');
 
         // Registrar eventos — SIEMPRE, independiente del mapa
-        DOM.btnCumming.addEventListener('click',      () => selectOrigin('cumming'));
+        DOM.btnCumming.addEventListener('click', () => selectOrigin('cumming'));
         DOM.btnQuintaNormal.addEventListener('click', () => selectOrigin('quintanormal'));
-        DOM.btnGenerate.addEventListener('click',     startRouteAnimation);
-        DOM.btnDownload.addEventListener('click',     triggerDownload);
-        DOM.btnReset.addEventListener('click',        resetToWelcome);
+        DOM.btnGenerate.addEventListener('click', startRouteAnimation);
+        DOM.btnDownload.addEventListener('click', triggerDownload);
+        DOM.btnReset.addEventListener('click', resetToWelcome);
 
         // Cargar descuentos en segundo plano (no bloquea la UI)
         ConectaYungay.Repository.getDiscounts()
             .then(data => { discountsList = data; })
-            .catch(e   => console.warn('Descuentos: usando fallback.', e));
+            .catch(e => console.warn('Descuentos: usando fallback.', e));
 
         // Detectar parámetro QR en la URL
         detectQRParams();
@@ -141,9 +141,11 @@ ConectaYungay.UI = (function () {
         const el = document.createElement('div');
         el.className = 'route-node-item fade-in';
         el.id = `ui-node-${index}`;
+        // Security: escapeHTML previene XSS en caso de datos comprometidos del repositorio
+        const safeName = ConectaYungay.Security.escapeHTML(node.name);
         el.innerHTML = `
             <div class="node-number">${index + 1}</div>
-            <div class="node-details"><span class="node-name">${node.name}</span></div>
+            <div class="node-details"><span class="node-name">${safeName}</span></div>
         `;
         el.addEventListener('click', () => selectActiveNode(index));
         DOM.nodesContainer.appendChild(el);
@@ -182,27 +184,36 @@ ConectaYungay.UI = (function () {
         DOM.discountsContainer.innerHTML = '';
 
         const categories = [
-            { label: 'Cafetería',   data: recs.cafeteria   },
-            { label: 'Restaurante', data: recs.restaurante  },
-            { label: 'Heladería',   data: recs.heladeria    }
+            { label: 'Cafetería', data: recs.cafeteria },
+            { label: 'Restaurante', data: recs.restaurante },
+            { label: 'Heladería', data: recs.heladeria }
         ];
 
         categories.forEach(cat => {
             if (!cat.data) return;
 
-            const query   = encodeURIComponent(`${cat.data.name}, ${cat.data.address}, Barrio Yungay, Santiago, Chile`);
-            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+            // Security: sanitizar la URL antes de usarla en href
+            const rawQuery = `${cat.data.name}, ${cat.data.address}, Barrio Yungay, Santiago, Chile`;
+            const mapsUrl = ConectaYungay.Security.sanitizeURL(
+                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(rawQuery)}`
+            );
+
+            // Security: escapar todos los datos del repositorio antes de inyectarlos
+            const safeLabel = ConectaYungay.Security.escapeHTML(cat.label);
+            const safeName = ConectaYungay.Security.escapeHTML(cat.data.name);
+            const safeAddress = ConectaYungay.Security.escapeHTML(cat.data.address);
+            const safeDistance = ConectaYungay.Security.escapeHTML(String(cat.data.distance));
 
             const card = document.createElement('div');
             card.className = 'discount-card fade-in';
             card.innerHTML = `
                 <div class="discount-card-header">
-                    <span class="discount-category">${cat.label}</span>
-                    <span class="discount-distance">A ${cat.data.distance} metros</span>
+                    <span class="discount-category">${safeLabel}</span>
+                    <span class="discount-distance">A ${safeDistance} metros</span>
                 </div>
                 <div class="discount-card-body">
-                    <h4 class="discount-name">${cat.data.name}</h4>
-                    <p class="discount-address">${cat.data.address}</p>
+                    <h4 class="discount-name">${safeName}</h4>
+                    <p class="discount-address">${safeAddress}</p>
                 </div>
                 <div class="discount-card-footer">
                     <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="btn-map-link">
@@ -213,6 +224,7 @@ ConectaYungay.UI = (function () {
             DOM.discountsContainer.appendChild(card);
         });
     }
+
 
     // ─────────────────────────────────────────────
     //  DESCARGA Y RESET
@@ -230,8 +242,8 @@ ConectaYungay.UI = (function () {
         const cleanUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
         window.history.pushState({ path: cleanUrl }, '', cleanUrl);
         currentOrigin = null;
-        routeNodes    = [];
-        try { ConectaYungay.MapRenderer.clearRoute(); } catch (e) {}
+        routeNodes = [];
+        try { ConectaYungay.MapRenderer.clearRoute(); } catch (e) { }
         showScreen('welcome');
     }
 

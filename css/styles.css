@@ -204,6 +204,193 @@ body {
     background-color: rgba(167, 48, 42, 0.02);
 }
 
+/* ENCUESTA DE VISITANTE (Survey Screen) */
+.survey-card {
+    max-width: 600px;
+    text-align: left;
+}
+
+.survey-card .logo-welcome {
+    display: block;
+    margin: 0 auto 25px;
+}
+
+.survey-card .survey-title {
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    color: var(--color-crimson);
+    text-align: center;
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.survey-intro {
+    text-align: center;
+    color: var(--color-slate);
+    font-size: 1rem;
+    margin-bottom: 28px;
+}
+
+.survey-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.survey-field {
+    border: none;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.survey-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-dark);
+    padding: 0;
+}
+
+.survey-input {
+    width: 100%;
+    padding: 12px 14px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-dark);
+    background: var(--color-white);
+    border: 2px solid var(--color-slate);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.2s ease;
+}
+
+.survey-input:focus {
+    outline: none;
+    border-color: var(--color-crimson);
+    box-shadow: 0 0 0 3px rgba(167, 48, 42, 0.15);
+}
+
+.survey-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.survey-chip {
+    position: relative;
+    cursor: pointer;
+}
+
+.survey-chip input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.survey-chip span {
+    display: inline-block;
+    padding: 10px 16px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-dark);
+    background: var(--color-white);
+    border: 2px solid var(--color-slate);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+}
+
+.survey-chip:hover span {
+    border-color: var(--color-crimson);
+    color: var(--color-crimson);
+}
+
+.survey-chip input:checked + span {
+    background: var(--color-crimson);
+    border-color: var(--color-crimson);
+    color: var(--color-white);
+}
+
+.survey-chip input:focus-visible + span {
+    outline: 3px solid rgba(200, 138, 42, 0.5);
+    outline-offset: 2px;
+}
+
+.survey-error {
+    color: var(--color-crimson);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.survey-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 6px;
+}
+
+.btn-survey-primary,
+.btn-survey-secondary {
+    flex: 1;
+    padding: 16px 20px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.btn-survey-primary {
+    background: var(--color-crimson);
+    color: var(--color-white);
+    border: none;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-survey-primary:hover:not(:disabled) {
+    background: #8E2620;
+    transform: translateY(-2px);
+}
+
+.btn-survey-primary:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.btn-survey-secondary {
+    background: var(--color-white);
+    color: var(--color-dark);
+    border: 2px solid var(--color-slate);
+}
+
+.btn-survey-secondary:hover {
+    border-color: var(--color-crimson);
+    color: var(--color-crimson);
+}
+
+.survey-note {
+    margin-top: 22px;
+    text-align: center;
+    color: var(--color-slate);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+    .survey-card {
+        padding: 32px 22px;
+    }
+
+    .survey-card .survey-title {
+        font-size: 1.8rem;
+    }
+
+    .survey-actions {
+        flex-direction: column-reverse;
+    }
+}
+
 /* PANTALLA PRINCIPAL DE LA APLICACIÓN (App Screen) */
 .app-header {
     background-color: var(--color-white);

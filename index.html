@@ -34,7 +34,7 @@
         style-src   'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com;
         font-src    'self' https://fonts.gstatic.com;
         img-src     'self' data: https://*.tile.openstreetmap.org https://*.openstreetmap.org;
-        connect-src 'self' https://*.openstreetmap.org;
+        connect-src 'self' https://*.openstreetmap.org https://nsevebyyjlixehekoqxi.supabase.co;
         frame-src   'none';
         object-src  'none';
         base-uri    'self';
@@ -74,6 +74,79 @@
 </head>
 
 <body>
+
+    <!-- 0. ENCUESTA DE VISITANTE (se muestra una vez por navegador; ver js/presentation/surveyPanel.js) -->
+    <main id="survey-screen" class="welcome-container hidden">
+        <section class="welcome-card survey-card">
+            <img src="assets/logo_sin_fondo.png" alt="Logo Conecta Yungay" class="logo-welcome">
+            <h1 class="survey-title">Cuéntanos de tu Visita</h1>
+            <p class="survey-intro">
+                Son tres preguntas opcionales y anónimas. Nos ayudan a mejorar el recorrido y no pedimos tu nombre
+                ni tu contacto.
+            </p>
+
+            <form id="survey-form" class="survey-form" novalidate>
+                <div class="survey-field">
+                    <label class="survey-label" for="survey-edad">¿Qué edad tienes?</label>
+                    <input type="number" id="survey-edad" class="survey-input" min="0" max="120" step="1"
+                        inputmode="numeric" placeholder="Ej: 34">
+                </div>
+
+                <div class="survey-field">
+                    <label class="survey-label" for="survey-nacionalidad">¿Cuál es tu nacionalidad?</label>
+                    <select id="survey-nacionalidad" class="survey-input">
+                        <option value="">Elige un país</option>
+                    </select>
+                </div>
+
+                <div id="survey-comuna-field" class="survey-field hidden">
+                    <label class="survey-label" for="survey-comuna">¿En qué comuna vives?</label>
+                    <select id="survey-comuna" class="survey-input">
+                        <option value="">Elige tu comuna</option>
+                    </select>
+                </div>
+
+                <fieldset class="survey-field">
+                    <legend class="survey-label">¿Qué te trae al barrio?</legend>
+                    <div class="survey-chips">
+                        <label class="survey-chip">
+                            <input type="radio" name="motivo" value="Turismo">
+                            <span>Turismo</span>
+                        </label>
+                        <label class="survey-chip">
+                            <input type="radio" name="motivo" value="Patrimonio y cultura">
+                            <span>Patrimonio y cultura</span>
+                        </label>
+                        <label class="survey-chip">
+                            <input type="radio" name="motivo" value="Gastronomía">
+                            <span>Gastronomía</span>
+                        </label>
+                        <label class="survey-chip">
+                            <input type="radio" name="motivo" value="Estudio o trabajo">
+                            <span>Estudio o trabajo</span>
+                        </label>
+                        <label class="survey-chip">
+                            <input type="radio" name="motivo" value="Vivo en el barrio">
+                            <span>Vivo en el barrio</span>
+                        </label>
+                        <label class="survey-chip">
+                            <input type="radio" name="motivo" value="Otro">
+                            <span>Otro</span>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <p id="survey-error" class="survey-error hidden" role="alert"></p>
+
+                <div class="survey-actions">
+                    <button type="button" id="survey-skip" class="btn-survey-secondary">Prefiero no responder</button>
+                    <button type="submit" id="survey-submit" class="btn-survey-primary">Continuar</button>
+                </div>
+            </form>
+
+            <p class="survey-note">Puedes dejar preguntas en blanco. El recorrido es el mismo respondas o no.</p>
+        </section>
+    </main>
 
     <!-- 1. PANTALLA DE BIENVENIDA -->
     <main id="welcome-screen" class="welcome-container fade-in">
@@ -168,10 +241,14 @@
     <script src="js/data/securityUtils.js"></script>
     <!-- 1. Datos -->
     <script src="js/data/routeRepository.js"></script>
+    <script src="js/data/surveyCatalogs.js"></script>
+    <script src="js/data/surveyRepository.js"></script>
     <!-- 2. Negocio -->
     <script src="js/business/routeService.js"></script>
+    <script src="js/business/visitService.js"></script>
     <!-- 3. Presentación -->
     <script src="js/presentation/mapRenderer.js"></script>
+    <script src="js/presentation/surveyPanel.js"></script>
     <script src="js/presentation/uiController.js"></script>
 </body>
 

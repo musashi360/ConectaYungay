@@ -7,9 +7,10 @@
  *     insertan con innerHTML o en popups de Leaflet.
  *   - Validar las URLs que van a href.
  *
- * Alcance: el sitio es estático (GitHub Pages), sin formularios ni backend.
- *   Si se agregan datos de usuario o un servidor, las validaciones deben
- *   volver a este módulo y repetirse en el servidor.
+ * Alcance: el sitio es estático (GitHub Pages). La encuesta de visitantes
+ *   envía datos a Supabase: sus campos se validan en surveyPanel.js y la
+ *   tabla solo admite INSERT anónimo (RLS). Si se agregan datos de usuario
+ *   que se muestren en el DOM, deben pasar por escapeHTML.
  */
 
 window.ConectaYungay = window.ConectaYungay || {};

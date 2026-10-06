@@ -47,8 +47,8 @@ ConectaYungay.UI = (function () {
             .then(data => { discountsList = data; })
             .catch(e => console.warn('Descuentos: usando fallback.', e));
 
-        // Detectar parámetro QR en la URL
-        detectQRParams();
+        // Encuesta de visitante primero; al terminar (o si ya se respondió) se detecta el QR
+        ConectaYungay.Survey.run(detectQRParams);
     }
 
     // ─────────────────────────────────────────────
@@ -83,6 +83,8 @@ ConectaYungay.UI = (function () {
     // ─────────────────────────────────────────────
     async function selectOrigin(origin) {
         currentOrigin = origin;
+        // Registra la visita con las respuestas de la encuesta (si las hubo)
+        ConectaYungay.VisitService.iniciarVisita(origin);
         const displayName = origin === 'cumming' ? 'Metro Cumming' : 'Metro Quinta Normal';
         DOM.routeName.textContent = `Recorrido desde ${displayName}`;
 
@@ -160,7 +162,10 @@ ConectaYungay.UI = (function () {
             <div class="node-number">${index + 1}</div>
             <div class="node-details"><span class="node-name">${safeName}</span></div>
         `;
-        el.addEventListener('click', () => selectActiveNode(index));
+        el.addEventListener('click', () => {
+            selectActiveNode(index);
+            ConectaYungay.VisitService.registrarClic(node.name);
+        });
         DOM.nodesContainer.appendChild(el);
         DOM.nodesContainer.scrollTop = DOM.nodesContainer.scrollHeight;
     }

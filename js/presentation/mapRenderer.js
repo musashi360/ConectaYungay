@@ -15,7 +15,7 @@ ConectaYungay.MapRenderer = (function () {
 
     // Centro del Barrio Yungay
     const CENTER = { lat: -33.4405, lng: -70.6745 };
-    const ZOOM   = 15;
+    const ZOOM   = 16;
 
     // Colores de la paleta del proyecto
     const COLOR_CRIMSON = '#A7302A';
@@ -177,7 +177,7 @@ ConectaYungay.MapRenderer = (function () {
         html2canvas(mapEl, {
             useCORS:    true,
             allowTaint: false,
-            scale:      2
+            scale:      3
         }).then(canvas => {
             const link     = document.createElement('a');
             link.download  = `recorrido-${routeName.toLowerCase().replace(/\s+/g, '-')}.png`;

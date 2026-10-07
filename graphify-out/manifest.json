@@ -1,0 +1,128 @@
+{
+  "js/business/routeService.js": {
+    "mtime": 1790440172.2870708,
+    "seen": 1791379420.7140372,
+    "ast_hash": "84e57a1c506c52acd707467513438e20",
+    "semantic_hash": "84e57a1c506c52acd707467513438e20"
+  },
+  "js/business/visitService.js": {
+    "mtime": 1791312248.6489015,
+    "seen": 1791379420.7140405,
+    "ast_hash": "b44827cae696884fdb29ad1cdf49a933",
+    "semantic_hash": "b44827cae696884fdb29ad1cdf49a933"
+  },
+  "js/data/routeRepository.js": {
+    "mtime": 1791226553.8979926,
+    "seen": 1791379420.7140422,
+    "ast_hash": "48b0eb92aa08b0ef5599d60ae856ff33",
+    "semantic_hash": "48b0eb92aa08b0ef5599d60ae856ff33"
+  },
+  "js/data/securityUtils.js": {
+    "mtime": 1791312083.2137222,
+    "seen": 1791379420.714043,
+    "ast_hash": "4bbf266cfbee7980f0da612d17ee6c50",
+    "semantic_hash": "4bbf266cfbee7980f0da612d17ee6c50"
+  },
+  "js/data/surveyCatalogs.js": {
+    "mtime": 1791312115.056435,
+    "seen": 1791379420.7140436,
+    "ast_hash": "f574f95bfcb1cc9b77a45ba4a2254044",
+    "semantic_hash": "f574f95bfcb1cc9b77a45ba4a2254044"
+  },
+  "js/data/surveyRepository.js": {
+    "mtime": 1791312248.5842206,
+    "seen": 1791379420.7140443,
+    "ast_hash": "a7810967446a7af506c7cd6a0d757cd1",
+    "semantic_hash": "a7810967446a7af506c7cd6a0d757cd1"
+  },
+  "js/httpsRedirect.js": {
+    "mtime": 1791226553.8407607,
+    "seen": 1791379420.7140453,
+    "ast_hash": "af210f22c9726436dcc346e39008ff15",
+    "semantic_hash": "af210f22c9726436dcc346e39008ff15"
+  },
+  "js/presentation/mapRenderer.js": {
+    "mtime": 1791380648.0199926,
+    "seen": 1791381300.299568,
+    "ast_hash": "4e33ec0c5df92eee8658696e3d7924ce",
+    "semantic_hash": "4e33ec0c5df92eee8658696e3d7924ce"
+  },
+  "js/presentation/surveyPanel.js": {
+    "mtime": 1791312258.1220648,
+    "seen": 1791379420.7140462,
+    "ast_hash": "40887ad73fdce9b1a5cb20577b8cb8e1",
+    "semantic_hash": "40887ad73fdce9b1a5cb20577b8cb8e1"
+  },
+  "js/presentation/uiController.js": {
+    "mtime": 1791312263.5695465,
+    "seen": 1791379420.714047,
+    "ast_hash": "b12d06769b328ce0d42ab6868d3f0358",
+    "semantic_hash": "b12d06769b328ce0d42ab6868d3f0358"
+  },
+  "server.ps1": {
+    "mtime": 1791226554.0462928,
+    "seen": 1791379420.7140474,
+    "ast_hash": "cf8d40c18d2d5fdfdc91e0e4dbc532ab",
+    "semantic_hash": "cf8d40c18d2d5fdfdc91e0e4dbc532ab"
+  },
+  "supabase/visitas_y_clics.sql": {
+    "mtime": 1791312263.7582583,
+    "seen": 1791379420.7140486,
+    "ast_hash": "373d1ec6d113867251ab5558c99c06a0",
+    "semantic_hash": "373d1ec6d113867251ab5558c99c06a0"
+  },
+  "data/Descuentos.txt": {
+    "mtime": 1790440172.2837994,
+    "seen": 1791379420.7140493,
+    "ast_hash": "1ad273ce6b789e0cc8e5eefa550180be",
+    "semantic_hash": "1ad273ce6b789e0cc8e5eefa550180be"
+  },
+  "data/Recorrido Metro Cumming.txt": {
+    "mtime": 1790440172.2837994,
+    "seen": 1791379420.71405,
+    "ast_hash": "b38005a337436cdab6e5d62eb3548afe",
+    "semantic_hash": "b38005a337436cdab6e5d62eb3548afe"
+  },
+  "data/Recorrido Metro Quinta Normal.txt": {
+    "mtime": 1790440172.286067,
+    "seen": 1791379420.7140505,
+    "ast_hash": "edf28f7f3b7406e980942fdfdb7419e1",
+    "semantic_hash": "edf28f7f3b7406e980942fdfdb7419e1"
+  },
+  "data/codigo de colores.txt": {
+    "mtime": 1790440172.286067,
+    "seen": 1791379420.714051,
+    "ast_hash": "6b6aed6875fe591560a3e5eef816784e",
+    "semantic_hash": "6b6aed6875fe591560a3e5eef816784e"
+  },
+  "index.html": {
+    "mtime": 1791380570.5592258,
+    "seen": 1791381300.299576,
+    "ast_hash": "6e1ab74fe34bc3aaaf276329654f78e9",
+    "semantic_hash": "6e1ab74fe34bc3aaaf276329654f78e9"
+  },
+  "assets/logo.png": {
+    "mtime": 1790440172.2817996,
+    "seen": 1791379420.7140524,
+    "ast_hash": "bf4d87874a4b5e59d21178861b8d4fff",
+    "semantic_hash": "bf4d87874a4b5e59d21178861b8d4fff"
+  },
+  "assets/logo_sin_fondo.png": {
+    "mtime": 1790440172.2827995,
+    "seen": 1791379420.7140532,
+    "ast_hash": "becc2005fdfe6aa9c606ad6ae88301dc",
+    "semantic_hash": "becc2005fdfe6aa9c606ad6ae88301dc"
+  },
+  "assets/mapa.png": {
+    "mtime": 1790440172.2837994,
+    "seen": 1791379420.7140536,
+    "ast_hash": "8ae1dd54ef3dbd71e6d70750d4189a5c",
+    "semantic_hash": "8ae1dd54ef3dbd71e6d70750d4189a5c"
+  },
+  "assets/panel-visitante.png": {
+    "mtime": 1791311451.0035655,
+    "seen": 1791379420.7140543,
+    "ast_hash": "9a33e4fa9e21dbcee584795363fe10d2",
+    "semantic_hash": "9a33e4fa9e21dbcee584795363fe10d2"
+  }
+}

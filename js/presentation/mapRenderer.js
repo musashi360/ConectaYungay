@@ -66,10 +66,13 @@ ConectaYungay.MapRenderer = (function () {
             renderer:       L.canvas() // Fuerza a Leaflet a dibujar líneas en Canvas, previniendo el bug de desplazamiento en html2canvas
         });
 
-        // Tiles de OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            maxZoom: 19
+        // Tiles de Google Maps (capa de calles, lyrs=m) servidos por mt0..mt3, con nombres en español (hl=es)
+        L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&hl=es&x={x}&y={y}&z={z}', {
+            subdomains:  '0123',
+            tileSize:    256,
+            minZoom:     0,
+            maxZoom:     20,
+            attribution: '© Google Maps'
         }).addTo(map);
     }
 

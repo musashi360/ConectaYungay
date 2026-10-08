@@ -10,6 +10,11 @@
  *      (registrarClic). Si no hubo encuesta, el clic queda sin visita asociada.
  *
  * Los errores de red no bloquean la app: solo se registran en consola.
+ *
+ * Conexión a Supabase: la clave publicable (anon) es pública por diseño. La
+ * protección real está en las tablas: RLS activo y una política que solo
+ * permite INSERT a usuarios anónimos (ver supabase/visitas_y_clics.sql).
+ * Nadie puede leer los datos desde el navegador.
  */
 
 window.ConectaYungay = window.ConectaYungay || {};
@@ -17,8 +22,20 @@ window.ConectaYungay = window.ConectaYungay || {};
 ConectaYungay.VisitService = (function () {
     const RESPUESTAS_KEY = 'conectayungay_respuestas';
 
+    const SUPABASE_URL = 'https://nsevebyyjlixehekoqxi.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_b1o9cpMZKk9uZu9Ov8gwqw_atm0K_HQ';
+    const TIMEOUT_MS = 8000;
+
     // Promesa con el id de la visita en curso (null si no hay visita o no se guardó)
     let visitaPendiente = Promise.resolve(null);
+
+    // ─────────────────────────────────────────────
+    //  CATÁLOGOS DE LA ENCUESTA (países y comunas)
+    // ─────────────────────────────────────────────
+    function obtenerCatalogos() {
+        const { PAISES, COMUNAS_POR_REGION } = ConectaYungay.SurveyCatalogs;
+        return { PAISES, COMUNAS_POR_REGION };
+    }
 
     // ─────────────────────────────────────────────
     //  RESPUESTAS DE LA ENCUESTA (guardadas en el navegador)
@@ -62,7 +79,7 @@ ConectaYungay.VisitService = (function () {
             origen
         };
 
-        visitaPendiente = ConectaYungay.SurveyRepository.insert('visitas', fila)
+        visitaPendiente = insertar('visitas', fila)
             .then(() => id)
             .catch(err => {
                 console.warn('Visita no guardada:', err);
@@ -77,11 +94,44 @@ ConectaYungay.VisitService = (function () {
      */
     function registrarClic(puntoInteres) {
         visitaPendiente
-            .then(visitaId => ConectaYungay.SurveyRepository.insert('clics_info', {
+            .then(visitaId => insertar('clics_info', {
                 visita_id: visitaId,
                 punto_interes: puntoInteres
             }))
             .catch(err => console.warn('Clic no guardado:', err));
+    }
+
+    // ─────────────────────────────────────────────
+    //  SUPABASE
+    // ─────────────────────────────────────────────
+    /**
+     * Inserta una fila en una tabla de Supabase.
+     * @param {'visitas'|'clics_info'} tabla
+     * @param {object} fila
+     * @returns {Promise<void>} rechaza si Supabase responde con error o no hay conexión
+     */
+    async function insertar(tabla, fila) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/${tabla}`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(fila),
+                signal: controller.signal
+            });
+            if (!res.ok) {
+                throw new Error(`Supabase respondió ${res.status} al insertar en ${tabla}`);
+            }
+        } finally {
+            clearTimeout(timer);
+        }
     }
 
     // ─────────────────────────────────────────────
@@ -99,6 +149,6 @@ ConectaYungay.VisitService = (function () {
         return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
     }
 
-    return { guardarRespuestas, iniciarVisita, registrarClic };
+    return { obtenerCatalogos, guardarRespuestas, iniciarVisita, registrarClic };
 
 })();

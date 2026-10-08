@@ -6,7 +6,48 @@
 window.ConectaYungay = window.ConectaYungay || {};
 
 ConectaYungay.Service = (function () {
-    
+    const { LUGARES, RECORRIDOS, DESCUENTOS } = ConectaYungay.Data;
+
+    /**
+     * Devuelve los hitos de un recorrido en orden, con sus coordenadas.
+     * Un hito sin coordenadas se omite y se registra como error: no se dibuja
+     * en un punto inventado que haría ver una ruta falsa.
+     * @param {string} recorridoId - id del recorrido (ej. 'cumming', 'quintanormal')
+     * @returns {Array<{name, lat, lng}>}
+     */
+    function getRoute(recorridoId) {
+        const recorrido = RECORRIDOS.find(r => r.id === recorridoId);
+        if (!recorrido) {
+            throw new Error(`No existe el recorrido "${recorridoId}".`);
+        }
+
+        return recorrido.paradas
+            .slice()
+            .sort((a, b) => a.orden - b.orden)
+            .reduce((nodes, parada) => {
+                const c = LUGARES[parada.lugar];
+                if (!c) {
+                    console.error(`[Service] Sin coordenadas para el hito: "${parada.lugar}". Se omite.`);
+                    return nodes;
+                }
+                nodes.push({ name: parada.lugar, lat: c.lat, lng: c.lng });
+                return nodes;
+            }, []);
+    }
+
+    /**
+     * Devuelve los locales con descuento que tienen coordenadas válidas,
+     * para que ninguno aparezca con una distancia falsa.
+     * @returns {Array<{category, name, address, lat, lng}>}
+     */
+    function getDiscounts() {
+        return DESCUENTOS.filter(d => {
+            const ok = Number.isFinite(d.lat) && Number.isFinite(d.lng);
+            if (!ok) console.error(`[Service] Sin coordenadas para el descuento: "${d.name}". Se omite.`);
+            return ok;
+        }).map(d => ({ ...d }));
+    }
+
     /**
      * Calcula la distancia en metros entre dos puntos geográficos usando la fórmula de Haversine
      * @param {number} lat1 - Latitud punto 1
@@ -77,6 +118,8 @@ ConectaYungay.Service = (function () {
     }
 
     return {
+        getRoute,
+        getDiscounts,
         calculateHaversineDistance,
         getClosestDiscounts
     };

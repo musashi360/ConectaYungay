@@ -43,9 +43,11 @@ ConectaYungay.UI = (function () {
         DOM.btnReset.addEventListener('click', resetToWelcome);
 
         // Cargar descuentos en segundo plano (no bloquea la UI)
-        ConectaYungay.Repository.getDiscounts()
-            .then(data => { discountsList = data; })
-            .catch(e => console.warn('Descuentos: usando fallback.', e));
+        try {
+            discountsList = ConectaYungay.Service.getDiscounts();
+        } catch (e) {
+            console.warn('No se pudieron cargar los descuentos.', e);
+        }
 
         // Encuesta de visitante primero; al terminar (o si ya se respondió) se detecta el QR
         ConectaYungay.Survey.run(detectQRParams);
@@ -111,7 +113,7 @@ ConectaYungay.UI = (function () {
 
         // Cargar nodos de la ruta
         try {
-            routeNodes = await ConectaYungay.Repository.getRoute(origin);
+            routeNodes = ConectaYungay.Service.getRoute(origin);
             if (!routeNodes.length) {
                 throw new Error('La ruta no tiene hitos con coordenadas válidas.');
             }

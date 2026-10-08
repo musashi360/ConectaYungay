@@ -56,7 +56,7 @@ ConectaYungay.Survey = (function () {
     //  SELECTORES (países y comunas)
     // ─────────────────────────────────────────────
     function poblarSelectores() {
-        const { PAISES, COMUNAS_POR_REGION } = ConectaYungay.SurveyCatalogs;
+        const { PAISES, COMUNAS_POR_REGION } = ConectaYungay.VisitService.obtenerCatalogos();
 
         PAISES.slice()
             .sort((a, b) => a.localeCompare(b, 'es'))

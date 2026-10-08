@@ -411,14 +411,20 @@ body {
 .header-branding {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
     min-width: 0;
 }
 
 .logo-header {
-    height: 64px;
+    height: 104px;
     width: auto;
     flex-shrink: 0;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.18));
+    transition: transform 0.3s ease;
+}
+
+.logo-header:hover {
+    transform: scale(1.05);
 }
 
 .header-title-container {
@@ -447,7 +453,7 @@ body {
     }
 
     .logo-header {
-        height: 52px;
+        height: 76px;
     }
 
     .header-title-container h1 {

@@ -12,6 +12,7 @@ window.ConectaYungay = window.ConectaYungay || {};
 ConectaYungay.UI = (function () {
     let routeNodes = [];
     let discountsList = [];
+    let discountsRequest = 0; // descarta respuestas de descuentos de un hito anterior
     let currentOrigin = null;
     let mapInitialized = false;
 
@@ -111,15 +112,18 @@ ConectaYungay.UI = (function () {
         try { ConectaYungay.MapRenderer.clearRoute(); } catch (e) { }
         routeNodes = [];
 
-        // Cargar nodos de la ruta
+        // Cargar nodos de la ruta (la capa de negocio alterna A/B por estación)
         try {
-            routeNodes = ConectaYungay.Service.getRoute(origin);
+            const recorrido = ConectaYungay.Service.elegirRecorrido(origin);
+            DOM.routeName.textContent = `${recorrido.nombre} desde ${displayName}`;
+            routeNodes = ConectaYungay.Service.getRoute(recorrido.id);
             if (!routeNodes.length) {
                 throw new Error('La ruta no tiene hitos con coordenadas válidas.');
             }
             DOM.btnGenerate.removeAttribute('disabled');
             DOM.btnDownload.setAttribute('disabled', 'true');
             DOM.nodesContainer.innerHTML = '<p class="placeholder-text">Haz clic en "Generar Recorrido" para trazar la ruta en el mapa.</p>';
+            discountsRequest++;
             DOM.discountsContainer.innerHTML = '<p class="placeholder-text">Los descuentos aparecerán al iniciar el recorrido.</p>';
             DOM.selectedNodeLabel.textContent = 'Ninguno';
         } catch (e) {
@@ -189,12 +193,20 @@ ConectaYungay.UI = (function () {
             activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        // Capa de Negocio: calcular descuentos más cercanos
-        const recs = ConectaYungay.Service.getClosestDiscounts(
-            { lat: node.lat, lng: node.lng },
-            discountsList
-        );
-        renderDiscountsUI(recs);
+        // Capa de Negocio: calcular descuentos más cercanos (distancia a pie)
+        const request = ++discountsRequest;
+        DOM.discountsContainer.innerHTML = '<p class="placeholder-text">Buscando los locales más cercanos...</p>';
+        ConectaYungay.Service.getClosestDiscounts(node, discountsList)
+            .then(recs => {
+                // Si el visitante ya eligió otro hito, no pisar sus descuentos
+                if (request === discountsRequest) renderDiscountsUI(recs);
+            })
+            .catch(e => console.error('Error al calcular descuentos:', e));
+    }
+
+    function formatDistance(meters, aproximada) {
+        if (meters < 10) return 'A pasos';
+        return aproximada ? `A ~${meters} metros en línea recta` : `A ${meters} metros a pie`;
     }
 
     // ─────────────────────────────────────────────
@@ -222,14 +234,14 @@ ConectaYungay.UI = (function () {
             const safeLabel = ConectaYungay.Security.escapeHTML(cat.label);
             const safeName = ConectaYungay.Security.escapeHTML(cat.data.name);
             const safeAddress = ConectaYungay.Security.escapeHTML(cat.data.address);
-            const safeDistance = ConectaYungay.Security.escapeHTML(String(cat.data.distance));
+            const safeDistance = ConectaYungay.Security.escapeHTML(formatDistance(cat.data.distance, cat.data.aproximada));
 
             const card = document.createElement('div');
             card.className = 'discount-card fade-in';
             card.innerHTML = `
                 <div class="discount-card-header">
                     <span class="discount-category">${safeLabel}</span>
-                    <span class="discount-distance">A ${safeDistance} metros</span>
+                    <span class="discount-distance">${safeDistance}</span>
                 </div>
                 <div class="discount-card-body">
                     <h4 class="discount-name">${safeName}</h4>

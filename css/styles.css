@@ -452,8 +452,12 @@ body {
         padding: 12px 16px;
     }
 
+    .header-branding {
+        gap: 12px;
+    }
+
     .logo-header {
-        height: 76px;
+        height: 112px;
     }
 
     .header-title-container h1 {

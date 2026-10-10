@@ -66,8 +66,11 @@ ConectaYungay.MapRenderer = (function () {
             renderer:       L.canvas() // Fuerza a Leaflet a dibujar líneas en Canvas, previniendo el bug de desplazamiento en html2canvas
         });
 
-        // Tiles de Google Maps (capa de calles, lyrs=m) servidos por mt0..mt3, con nombres en español (hl=es)
-        L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&hl=es&x={x}&y={y}&z={z}', {
+        // Tiles de Google Maps (capa de calles, lyrs=m) servidos por mt0..mt3, con nombres en español (hl=es).
+        // En pantallas de alta densidad (teléfonos) se piden teselas al doble de resolución (scale=2)
+        // para que calles y textos se vean nítidos en vez de borrosos.
+        const tileScale = (window.devicePixelRatio || 1) > 1 ? 2 : 1;
+        L.tileLayer(`https://mt{s}.google.com/vt/lyrs=m&hl=es&scale=${tileScale}&x={x}&y={y}&z={z}`, {
             subdomains:  '0123',
             tileSize:    256,
             minZoom:     0,

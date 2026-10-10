@@ -16,7 +16,9 @@ create table clics_info (
   id            bigint generated always as identity primary key,
   creado_en     timestamptz not null default now(),
   visita_id     uuid references visitas(id),
-  punto_interes text not null check (char_length(punto_interes) <= 80)
+  punto_interes text not null check (char_length(punto_interes) <= 80),
+  -- 'apertura': se abrió el cartel del hito · 'mas_info': se pulsó "Más información"
+  accion        text not null default 'apertura' check (accion in ('apertura','mas_info'))
 );
 
 alter table visitas    enable row level security;

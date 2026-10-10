@@ -170,7 +170,7 @@ ConectaYungay.UI = (function () {
         `;
         el.addEventListener('click', () => {
             selectActiveNode(index);
-            ConectaYungay.VisitService.registrarClic(node.name);
+            ConectaYungay.PlaceInfo.open(node);
         });
         DOM.nodesContainer.appendChild(el);
         DOM.nodesContainer.scrollTop = DOM.nodesContainer.scrollHeight;
@@ -276,6 +276,7 @@ ConectaYungay.UI = (function () {
         currentOrigin = null;
         routeNodes = [];
         try { ConectaYungay.MapRenderer.clearRoute(); } catch (e) { }
+        ConectaYungay.PlaceInfo.close();
         showScreen('welcome');
     }
 

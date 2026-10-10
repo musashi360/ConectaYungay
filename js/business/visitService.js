@@ -6,8 +6,10 @@
  *   1. La encuesta guarda sus respuestas en el navegador (guardarRespuestas).
  *   2. Al elegir origen (Metro Cumming / Quinta Normal) se crea una fila en
  *      "visitas" con esas respuestas y el origen (iniciarVisita).
- *   3. Cada clic en un hito del recorrido crea una fila en "clics_info"
- *      (registrarClic). Si no hubo encuesta, el clic queda sin visita asociada.
+ *   3. Abrir el cartel de un hito crea una fila en "clics_info" con
+ *      accion = 'apertura'; pulsar "Más información" crea otra con
+ *      accion = 'mas_info' (registrarClic). Si no hubo encuesta, el clic
+ *      queda sin visita asociada.
  *
  * Los errores de red no bloquean la app: solo se registran en consola.
  *
@@ -88,15 +90,17 @@ ConectaYungay.VisitService = (function () {
     }
 
     /**
-     * Registra un clic en un hito del recorrido. Espera a que la visita esté
-     * guardada para poder asociarla (clave foránea).
+     * Registra un clic en el cartel de un hito del recorrido. Espera a que la
+     * visita esté guardada para poder asociarla (clave foránea).
      * @param {string} puntoInteres - nombre del hito
+     * @param {'apertura'|'mas_info'} accion - se abrió el cartel / se pidió más información
      */
-    function registrarClic(puntoInteres) {
+    function registrarClic(puntoInteres, accion) {
         visitaPendiente
             .then(visitaId => insertar('clics_info', {
                 visita_id: visitaId,
-                punto_interes: puntoInteres
+                punto_interes: puntoInteres,
+                accion
             }))
             .catch(err => console.warn('Clic no guardado:', err));
     }

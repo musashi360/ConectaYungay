@@ -232,6 +232,19 @@
             <p>Proyecto de Fomento al Turismo de Barrio Yungay — © 2026 <span>Conecta Yungay</span>. Todos los derechos
                 reservados.</p>
         </footer>
+
+        <!-- Cartel con información del lugar (se abre al hacer clic en un hito de "Tu Ruta") -->
+        <dialog id="place-dialog" class="place-dialog" aria-labelledby="place-dialog-title">
+            <button type="button" id="place-dialog-close" class="place-dialog-close" aria-label="Cerrar">&times;</button>
+            <h3 id="place-dialog-title" class="place-dialog-title"></h3>
+            <p class="place-dialog-text">Hola mundo</p>
+            <div id="place-dialog-more" class="place-dialog-more">
+                <div class="place-dialog-more-inner">
+                    <!-- Información ampliada del lugar: pendiente -->
+                </div>
+            </div>
+            <button type="button" id="place-dialog-more-btn" class="btn-primary place-dialog-more-btn">Más información</button>
+        </dialog>
     </div>
 
     <!-- Leaflet y html2canvas ya cargados en el <head> -->
@@ -250,6 +263,7 @@
     <script src="js/presentation/securityUtils.js"></script>
     <script src="js/presentation/mapRenderer.js"></script>
     <script src="js/presentation/surveyPanel.js"></script>
+    <script src="js/presentation/placeInfoPanel.js"></script>
     <script src="js/presentation/uiController.js"></script>
 </body>
 
